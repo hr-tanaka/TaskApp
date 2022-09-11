@@ -5,11 +5,12 @@ import java.util.Date
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
 
-open class Task : RealmObject(), Serializable {
+open class Task : RealmObject(), Serializable, MutableList<Task> {
     var title: String = ""      // タイトル
     var contents: String = ""   // 内容
     var date: Date = Date()     // 日時
     var category: String = ""      // カテゴリー
+
 
 
     // idをプライマリーキーとして設定

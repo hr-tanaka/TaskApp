@@ -2,12 +2,11 @@ package jp.techacademy.hiroaki.tanaka.taskapp
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.SearchView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import io.realm.Realm
 import io.realm.RealmChangeListener
-import io.realm.RealmConfiguration
-import io.realm.RealmConfiguration.Builder
 import io.realm.Sort
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -74,13 +73,33 @@ class MainActivity : AppCompatActivity() {
             true
         }
 
-
         reloadListView()
+
+        findViewById<SearchView>(R.id.search).setOnQueryTextListener(
+            object : SearchView.OnQueryTextListener {
+                // 入力テキストに変更があったとき
+                override fun onQueryTextChange(p0: String?): Boolean {
+                    if (!p0.isNullOrBlank()) {
+                        sortListView(p0)
+                    }
+                    return false
+                }
+                // 検索ボタンを押したとき
+                override fun onQueryTextSubmit(p0: String?): Boolean {
+                    return false
+                }
+
+            }
+        )
+
+
+
     }
 
     private fun reloadListView() {
+
         // Realmデータベースから、「すべてのデータを取得して新しい日時順に並べた結果」を取得
-        val taskRealmResults = mRealm.where(Task::class.java).findAll().sort("date", Sort.DESCENDING)
+        var taskRealmResults = mRealm.where(Task::class.java).findAll().sort("date", Sort.DESCENDING)
 
         // 上記の結果を、TaskListとしてセットする
         mTaskAdapter.mTaskList = mRealm.copyFromRealm(taskRealmResults)
@@ -90,7 +109,26 @@ class MainActivity : AppCompatActivity() {
 
         // 表示を更新するために、アダプターにデータが変更されたことを知らせる
         mTaskAdapter.notifyDataSetChanged()
+
     }
+
+    private fun sortListView(p0: String?) {
+
+        var taskRealmResults =
+            mRealm.where(Task::class.java).equalTo("category", p0).findAll()
+
+        // 上記の結果を、TaskListとしてセットする
+        mTaskAdapter.mTaskList = mRealm.copyFromRealm(taskRealmResults)
+
+        // TaskのListView用のアダプタに渡す
+        listView1.adapter = mTaskAdapter
+
+        // 表示を更新するために、アダプターにデータが変更されたことを知らせる
+        mTaskAdapter.notifyDataSetChanged()
+
+    }
+
+
 
     override fun onDestroy() {
         super.onDestroy()
@@ -99,3 +137,4 @@ class MainActivity : AppCompatActivity() {
     }
 
 }
+
