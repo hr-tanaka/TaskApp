@@ -45,6 +45,13 @@ class MainActivity : AppCompatActivity() {
         mTaskAdapter = TaskAdapter(this)
 
         // ListViewをタップしたときの処理
+        listView1.setOnItemClickListener { parent, _, position, _ ->
+            // 入力・編集する画面に遷移させる
+            val task = parent.adapter.getItem(position) as Task
+            val intent = Intent(this, InputActivity::class.java)
+            intent.putExtra(EXTRA_TASK, task.id)
+            startActivity(intent)
+        }
         listView1.setOnItemLongClickListener { parent, _, position, _ ->
             // タスクを削除する
             val task = parent.adapter.getItem(position) as Task
@@ -81,6 +88,8 @@ class MainActivity : AppCompatActivity() {
                 override fun onQueryTextChange(p0: String?): Boolean {
                     if (!p0.isNullOrBlank()) {
                         sortListView(p0)
+                    }else{
+                        reloadListView()
                     }
                     return false
                 }
